@@ -3,22 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Camera Access</title>
+  <title>QR Code Scanner</title>
 </head>
 <body>
-  <video id="video" width="640" height="480" autoplay></video>
+  <!-- Container untuk menampilkan video dari kamera -->
+  <div id="camera-container">
+    <video id="video-element" playsinline autoplay></video>
+    <canvas id="canvas-element" style="display:none;"></canvas>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const videoElement = document.getElementById('video');
+      const videoElement = document.getElementById('video-element');
+      const canvasElement = document.getElementById('canvas-element');
+      const context = canvasElement.getContext('2d');
 
+      // Mengakses kamera belakang
       navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
         .then((stream) => {
           videoElement.srcObject = stream;
+          videoElement.play();
+
+          // Fungsi untuk menangkap dan memproses frame dari kamera
+          function captureFrame() {
+            // Ambil frame dari video
+            context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
+            // Dapatkan data gambar
+            const imageData = context.getImageData(0, 0, canvasElement.width, canvasElement.height);
+
+            // Gunakan library jsQR untuk mendeteksi QR code
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+            if (code) {
+              // QR code berhasil terdeteksi, lakukan sesuatu dengan datanya
+              console.log('QR Code detected:', code.data);
+            }
+
+            // Lanjutkan pemrosesan frame berikutnya
+            requestAnimationFrame(captureFrame);
+          }
+
+          // Panggil fungsi untuk pertama kali
+          captureFrame();
         })
         .catch((error) => {
           console.error('Error accessing camera:', error);
         });
+
+      // Fungsi untuk menghentikan akses kamera ketika halaman ditutup
+      function stopCameraAccess() {
+        const tracks = videoElement.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+      }
+
+      // Panggil fungsi stopCameraAccess() saat proyek selesai atau dihentikan
+      // Misalnya: window.addEventListener('unload', stopCameraAccess);
     });
   </script>
 </body>
