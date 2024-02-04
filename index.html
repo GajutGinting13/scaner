@@ -1,42 +1,25 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scanner QR Code</title>
-  <script src="https://cdn.rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
-  <style>
-    /* CSS untuk memutar video 180 derajat */
-    #scanner {
-      transform: rotateY(180deg);
-    }
-  </style>
+  <title>Camera Access</title>
 </head>
 <body>
-  <video id="scanner" width="100%"></video>
-  <button onclick="startScan()">Mulai Pemindaian</button>
+  <video id="video" width="640" height="480" autoplay></video>
 
   <script>
-    function startScan() {
-      const video = document.getElementById('scanner');
-      const scanner = new Instascan.Scanner({ video: video });
+    document.addEventListener('DOMContentLoaded', () => {
+      const videoElement = document.getElementById('video');
 
-      Instascan.Camera.getCameras().then(function (cameras) {
-        if (cameras.length > 0) {
-          const rearCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
-
-          if (rearCamera) {
-            scanner.start(rearCamera);
-          } else {
-            scanner.start(cameras[0]);
-          }
-        } else {
-          alert('Tidak ada kamera yang ditemukan!');
-        }
-      }).catch(function (error) {
-        console.error(error);
-      });
-    }
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then((stream) => {
+          videoElement.srcObject = stream;
+        })
+        .catch((error) => {
+          console.error('Error accessing camera:', error);
+        });
+    });
   </script>
 </body>
 </html>
