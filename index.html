@@ -23,16 +23,25 @@
     });
 
     // Mulai kamera belakang jika tersedia
-    Instascan.Camera.getCameras().then(function (cameras) {
-      let rearCamera = cameras.find(camera => camera.name.toLowerCase().includes('back') || camera.name.toLowerCase().includes('rear'));
-      if (rearCamera) {
-        scanner.start(rearCamera);
-      } else {
-        console.error('Tidak ada kamera belakang yang ditemukan.');
-      }
-    }).catch(function (e) {
-      console.error(e);
-    });
+    // Mendapatkan daftar kamera yang tersedia
+Instascan.Camera.getCameras().then(function (cameras) {
+  if (cameras.length > 0) {
+    // Memulai Instascan Scanner dengan kamera yang dipilih
+    let selectedCamera = cameras[0]; // Misalnya, menggunakan kamera pertama
+    scanner.start(selectedCamera);
+
+    // Menangkap elemen video dari DOM
+    let videoElement = document.getElementById('video');
+
+    // Memperbarui CSS untuk membalik horizontal video
+    videoElement.style.transform = 'scaleX(-1)';
+  } else {
+    console.error('Tidak ada kamera yang ditemukan.');
+  }
+}).catch(function (error) {
+  console.error('Error accessing camera:', error);
+});
+
   </script>
 </body>
 </html>
