@@ -44,7 +44,7 @@
 
     scanner.addListener('scan', function(content) {
       qrResult.textContent = 'Hasil QR Code: ' + content;
-      window.location.href = content;
+      window.open(content, '_blank');
     });
 
     function startScanner() {
