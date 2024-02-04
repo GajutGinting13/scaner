@@ -32,18 +32,12 @@
     <div id="qr-result">Hasil QR Code akan muncul di sini</div>
     <div id="switch-camera" onclick="switchCamera()">Switch Kamera</div>
 
-    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@2.1.0/dist/jsQR.min.js"></script>
     <script>
         const video = document.getElementById('qr-video');
         const qrResult = document.getElementById('qr-result');
         const switchCameraButton = document.getElementById('switch-camera');
-        let currentFacingMode = 'environment';
-
-        const scanner = new Instascan.Scanner({ video });
-
-        scanner.addListener('scan', function (content) {
-            qrResult.textContent = 'Hasil QR Code: ' + content;
-        });
+        let currentFacingMode = 'user';
 
         function switchCamera() {
             currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
@@ -51,21 +45,33 @@
         }
 
         function startScanner() {
-            Instascan.Camera.getCameras().then(function (cameras) {
-                if (cameras.length > 0) {
-                    const constraints = {
-                        video: {
-                            deviceId: { exact: cameras[0].deviceId },
-                            facingMode: currentFacingMode
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } })
+                .then((stream) => {
+                    video.srcObject = stream;
+                    video.play();
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+
+                    const scanQRCode = () => {
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                        const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+                        if (code) {
+                            qrResult.textContent = 'Hasil QR Code: ' + code.data;
                         }
+
+                        requestAnimationFrame(scanQRCode);
                     };
-                    scanner.start(cameras[0], constraints);
-                } else {
-                    console.error('Tidak ada kamera yang ditemukan.');
-                }
-            }).catch(function (e) {
-                console.error(e);
-            });
+
+                    requestAnimationFrame(scanQRCode);
+                })
+                .catch((error) => {
+                    console.error('Error accessing camera:', error);
+                });
         }
 
         startScanner();
