@@ -1,50 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR Code Scanner</title>
-  <!-- Library Instascan -->
+  <title>Scanner QR Code</title>
   <script src="https://cdn.rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 </head>
 <body>
-  <!-- Elemen video untuk menampilkan tampilan kamera -->
   <video id="scanner" width="100%"></video>
+  <button onclick="startScan()">Mulai Pemindaian</button>
 
-  <!-- Tombol untuk memulai pemindaian -->
-  <button onclick="startScan()">Start Scan</button>
+  <script>
+    function startScan() {
+      const video = document.getElementById('scanner');
+      const scanner = new Instascan.Scanner({ video: video });
 
-  <!-- Script JavaScript untuk mengatur pemindaian -->
-  <!-- ... (kode HTML sebelumnya) ... -->
+      Instascan.Camera.getCameras().then(function (cameras) {
+        if (cameras.length > 0) {
+          const rearCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
 
-<script>
-  function startScan() {
-    let video = document.getElementById('scanner');
-    let scanner = new Instascan.Scanner({ video: video });
-
-    Instascan.Camera.getCameras().then(function (cameras) {
-      console.log(cameras); // Cetak informasi kamera ke konsol
-
-      if (cameras.length > 0) {
-        const rearCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
-
-        if (rearCamera) {
-          console.log('Menggunakan kamera belakang:', rearCamera); // Cetak informasi kamera yang dipilih
-          scanner.start(rearCamera);
+          if (rearCamera) {
+            scanner.start(rearCamera);
+          } else {
+            scanner.start(cameras[0]);
+          }
         } else {
-          console.log('Menggunakan kamera default:', cameras[0]); // Cetak informasi kamera default
-          scanner.start(cameras[0]);
+          alert('Tidak ada kamera yang ditemukan!');
         }
-      } else {
-        alert('Tidak ada kamera yang ditemukan!');
-      }
-    }).catch(function (error) {
-      console.error(error);
-    });
-  }
-</script>
-
-<!-- ... (bagian HTML selanjutnya) ... -->
-
+      }).catch(function (error) {
+        console.error(error);
+      });
+    }
+  </script>
 </body>
 </html>
