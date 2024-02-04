@@ -2,72 +2,73 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Scanner</title>
-    <style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Scanner</title>
+  <style>
     #video-container {
-        position: relative;
-        width: 100%;
-        /* Sesuaikan dengan lebar layar HP */
-        height: 70vh;
-        /* Sesuaikan dengan tinggi layar HP */
+      position: relative;
+      width: 100%;
+      /* Sesuaikan dengan lebar layar HP */
+      height: 70vh;
+      /* Sesuaikan dengan tinggi layar HP */
     }
 
     #qr-video {
-        width: 100%;
-        height: 100%;
+      width: 100%;
+      height: 100%;
     }
 
     #qr-result {
-        margin-top: 10px;
-        font-size: 18px;
+      margin-top: 10px;
+      font-size: 18px;
     }
-    </style>
+  </style>
 </head>
 
 <body>
-    <div id="video-container">
-        <video id="qr-video" width="100%" height="100%" playsinline></video>
-    </div>
-    <div id="qr-result">Hasil QR Code akan muncul di sini</div>
+  <div id="video-container">
+    <video id="qr-video" width="100%" height="100%" playsinline></video>
+  </div>
+  <div id="qr-result">Hasil QR Code akan muncul di sini</div>
 
-    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
-    <script>
+  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+  <script>
     const video = document.getElementById('qr-video');
     const qrResult = document.getElementById('qr-result');
 
     let scanner = new Instascan.Scanner({
-        video,
-        mirror: false
+      video,
+      mirror: false
     });
 
     scanner.addListener('scan', function(content) {
-        qrResult.textContent = 'Hasil QR Code: ' + content;
+      qrResult.textContent = 'Hasil QR Code: ' + content;
+      window.location.href = content;
     });
 
     function startScanner() {
-        Instascan.Camera.getCameras().then(function(cameras) {
-            if (cameras.length > 0) {
-                const constraints = {
-                    video: {
-                        deviceId: {
-                            exact: cameras[cameras.length - 1].deviceId
-                        },
-                        facingMode: 'environment' // Menggunakan kamera belakang
-                    }
-                };
-                scanner.start(cameras[cameras.length - 1], constraints);
-            } else {
-                console.error('Tidak ada kamera yang ditemukan.');
+      Instascan.Camera.getCameras().then(function(cameras) {
+        if (cameras.length > 0) {
+          const constraints = {
+            video: {
+              deviceId: {
+                exact: cameras[cameras.length - 1].deviceId
+              },
+              facingMode: 'environment'
             }
-        }).catch(function(e) {
-            console.error(e);
-        });
+          };
+          scanner.start(cameras[cameras.length - 1], constraints);
+        } else {
+          console.error('Tidak ada kamera yang ditemukan.');
+        }
+      }).catch(function(e) {
+        console.error(e);
+      });
     }
 
     startScanner();
-    </script>
+  </script>
 </body>
 
 </html>
