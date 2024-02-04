@@ -15,29 +15,36 @@
   <button onclick="startScan()">Start Scan</button>
 
   <!-- Script JavaScript untuk mengatur pemindaian -->
-  <script>
-    // Fungsi untuk memulai pemindaian
-    function startScan() {
-      // Dapatkan elemen video dan buat objek Instascan
-      let video = document.getElementById('scanner');
-      let scanner = new Instascan.Scanner({ video: video });
+  <!-- ... (kode HTML sebelumnya) ... -->
 
-      // Callback ketika QR Code ditemukan
-      scanner.addListener('scan', function (content) {
-        alert('QR Code ditemukan! Isi: ' + content);
-      });
+<script>
+  function startScan() {
+    let video = document.getElementById('scanner');
+    let scanner = new Instascan.Scanner({ video: video });
 
-      // Mulai kamera
-      Instascan.Camera.getCameras().then(function (cameras) {
-        if (cameras.length > 0) {
-          scanner.start(rearCamera); // Gunakan kamera pertama
+    Instascan.Camera.getCameras().then(function (cameras) {
+      console.log(cameras); // Cetak informasi kamera ke konsol
+
+      if (cameras.length > 0) {
+        const rearCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
+
+        if (rearCamera) {
+          console.log('Menggunakan kamera belakang:', rearCamera); // Cetak informasi kamera yang dipilih
+          scanner.start(rearCamera);
         } else {
-          alert('Tidak ada kamera yang ditemukan!');
+          console.log('Menggunakan kamera default:', cameras[0]); // Cetak informasi kamera default
+          scanner.start(cameras[0]);
         }
-      }).catch(function (error) {
-        console.error(error);
-      });
-    }
-  </script>
+      } else {
+        alert('Tidak ada kamera yang ditemukan!');
+      }
+    }).catch(function (error) {
+      console.error(error);
+    });
+  }
+</script>
+
+<!-- ... (bagian HTML selanjutnya) ... -->
+
 </body>
 </html>
