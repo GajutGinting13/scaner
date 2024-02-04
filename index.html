@@ -3,78 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Scanner</title>
-    <style>
-        #video-container {
-            position: relative;
-            width: 400px;
-            height: 300px;
-        }
-        #qr-video {
-            width: 100%;
-            height: 100%;
-        }
-        #qr-result {
-            margin-top: 10px;
-            font-size: 18px;
-        }
-        #switch-camera {
-            margin-top: 10px;
-            cursor: pointer;
-            color: blue;
-        }
-    </style>
+    <title>Camera Example</title>
 </head>
 <body>
-    <div id="video-container">
-        <video id="qr-video" width="100%" height="100%" playsinline></video>
-    </div>
-    <div id="qr-result">Hasil QR Code akan muncul di sini</div>
-    <div id="switch-camera" onclick="switchCamera()">Switch Kamera</div>
+    <video id="camera" width="640" height="480" autoplay></video>
 
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@2.1.0/dist/jsQR.min.js"></script>
     <script>
-        const video = document.getElementById('qr-video');
-        const qrResult = document.getElementById('qr-result');
-        const switchCameraButton = document.getElementById('switch-camera');
-        let currentFacingMode = 'user';
+        const video = document.getElementById('camera');
 
-        function switchCamera() {
-            currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
-            startScanner();
+        async function openCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = stream;
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+            }
         }
 
-        function startScanner() {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } })
-                .then((stream) => {
-                    video.srcObject = stream;
-                    video.play();
-
-                    const canvas = document.createElement('canvas');
-                    const context = canvas.getContext('2d');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-
-                    const scanQRCode = () => {
-                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                        const code = jsQR(imageData.data, canvas.width, canvas.height);
-
-                        if (code) {
-                            qrResult.textContent = 'Hasil QR Code: ' + code.data;
-                        }
-
-                        requestAnimationFrame(scanQRCode);
-                    };
-
-                    requestAnimationFrame(scanQRCode);
-                })
-                .catch((error) => {
-                    console.error('Error accessing camera:', error);
-                });
-        }
-
-        startScanner();
+        openCamera();
     </script>
 </body>
 </html>
