@@ -44,6 +44,9 @@
             if (code) {
               // QR code berhasil terdeteksi, tampilkan hasilnya
               resultTextElement.textContent = 'QR Code detected: ' + code.data;
+            } else {
+              // Jika QR code tidak terdeteksi, hapus hasil sebelumnya
+              resultTextElement.textContent = '';
             }
 
             // Lanjutkan pemrosesan frame berikutnya
