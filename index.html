@@ -1,38 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Scanner</title>
-    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
-</head>
-<body>
-    <video id="camera" width="640" height="480" autoplay></video>
-
-    <script>
-        const video = document.getElementById('camera');
-
-        async function openCamera() {
-            try {
-                const scanner = new Instascan.Scanner({ video: video });
-                scanner.addListener('scan', function (content) {
-                    alert('QR Code content: ' + content);
-                    // Lakukan sesuatu dengan hasil pemindaian, misalnya redirect atau tindakan lainnya.
-                });
-
-                Instascan.Camera.getCameras().then(cameras => {
-                    if (cameras.length > 0) {
-                        scanner.start(cameras[0]);
-                    } else {
-                        console.error('No cameras found.');
-                    }
-                });
-            } catch (error) {
-                console.error('Error accessing camera:', error);
-            }
+<html>
+  <head>
+    <title>Instascan</title>
+    <script type="text/javascript" src="instascan.min.js"></script>
+  </head>
+  <body>
+    <video id="preview"></video>
+    <script type="text/javascript">
+      let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+      scanner.addListener('scan', function (content) {
+        console.log(content);
+      });
+      Instascan.Camera.getCameras().then(function (cameras) {
+        if (cameras.length > 0) {
+          scanner.start(cameras[0]);
+        } else {
+          console.error('No cameras found.');
         }
-
-        openCamera();
+      }).catch(function (e) {
+        console.error(e);
+      });
     </script>
-</body>
+  </body>
 </html>
