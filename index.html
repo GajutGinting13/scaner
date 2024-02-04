@@ -1,50 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instascan Scanner</title>
-    <!-- Menggunakan CDN untuk Instascan -->
-    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+    <title>QR Code Scanner</title>
+    <script src="https://rawgit.com/sitepoint-editors/html5-qrcode/master/dist/html5-qrcode.min.js"></script>
 </head>
-
 <body>
-    <h1>Instascan Scanner</h1>
-    <video id="scanner" playsinline style="transform: scaleX(-1);"></video>
-    <div id="result"></div>
+    <h1>QR Code Scanner</h1>
+    <video id="qr-video" width="100%"></video>
+    <div id="qr-result"></div>
+    <button id="start-scan">Start Scan</button>
 
     <script>
-    // Inisialisasi Instascan
-    let scanner = new Instascan.Scanner({
-        video: document.getElementById('scanner')
-    });
+        const video = document.getElementById('qr-video');
+        const resultContainer = document.getElementById('qr-result');
+        const startScanButton = document.getElementById('start-scan');
 
-    // Atur fungsi pemindaian
-    scanner.addListener('scan', function(content) {
-        // Handle hasil pemindaian di sini
-        document.getElementById('result').innerText = 'Hasil Pemindaian: ' + content;
-    });
+        startScanButton.addEventListener('click', () => {
+            // Menggunakan library html5-qrcode
+            const qrCodeScanner = new Html5Qrcode('qr-video', true);
 
-    // Mulai kamera belakang jika tersedia
-    // Mendapatkan daftar kamera yang tersedia
-    Instascan.Camera.getCameras().then(function(cameras) {
-        if (cameras.length > 0) {
-            // Memulai Instascan Scanner dengan kamera yang dipilih
-            let selectedCamera = cameras[1]; // Misalnya, menggunakan kamera pertama
-            scanner.start(selectedCamera);
-
-            // Menangkap elemen video dari DOM
-            let videoElement = document.getElementById('video');
-
-            // Memperbarui CSS untuk membalik horizontal video
-        } else {
-            console.error('Tidak ada kamera yang ditemukan.');
-        }
-    }).catch(function(error) {
-        console.error('Error accessing camera:', error);
-    });
+            qrCodeScanner.start(
+                (message) => {
+                    resultContainer.innerHTML = `Hasil Scan: ${message}`;
+                    qrCodeScanner.stop();
+                },
+                (error) => {
+                    console.log(error);
+                },
+                (videoError) => {
+                    console.log(videoError);
+                }
+            );
+        });
     </script>
 </body>
-
 </html>
