@@ -12,10 +12,16 @@
     <canvas id="canvas-element" style="display:none;"></canvas>
   </div>
 
+  <!-- Container untuk menampilkan hasil pemindaian QR code -->
+  <div id="result-container">
+    <p id="result-text"></p>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const videoElement = document.getElementById('video-element');
       const canvasElement = document.getElementById('canvas-element');
+      const resultTextElement = document.getElementById('result-text');
       const context = canvasElement.getContext('2d');
 
       // Mengakses kamera belakang
@@ -36,8 +42,8 @@
             const code = jsQR(imageData.data, imageData.width, imageData.height);
 
             if (code) {
-              // QR code berhasil terdeteksi, lakukan sesuatu dengan datanya
-              console.log('QR Code detected:', code.data);
+              // QR code berhasil terdeteksi, tampilkan hasilnya
+              resultTextElement.textContent = 'QR Code detected: ' + code.data;
             }
 
             // Lanjutkan pemrosesan frame berikutnya
